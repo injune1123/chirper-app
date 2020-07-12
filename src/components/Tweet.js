@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import { connnect, connect } from 'react-redux';
+import { connect } from 'react-redux';
+import { Link, withRouter } from 'react-router-dom';
 import { formatTweet, formatDate } from '../utils/helpers';
 import { TiArrowBackOutline, TiHeartOutline, TiHeartFullOutline} from 'react-icons/ti/index';
 import { handleToggleLike } from '../actions/tweets';
-import { handleInitialData } from '../actions/shared';
+
 class Tweet extends Component {
   handleLike = (e) => {
     e.preventDefault()
@@ -16,7 +17,7 @@ class Tweet extends Component {
   }
   toParent = (e, id) => {
     e.preventDefault()
-    // todo: Redirect to parent Tweet.
+    this.props.history.push(`/tweet/${id}`)
   }
 
   render() {
@@ -26,9 +27,9 @@ class Tweet extends Component {
       return <p>This tweet doesn't exist</p>
     }
 
-    const {name, avatar, timestamp, text, hasLiked, likes, replies, parent} = tweet;
+    const {id, name, avatar, timestamp, text, hasLiked, likes, replies, parent} = tweet;
     return (
-      <div>
+      <Link to={`/tweet/${id}`}>
         <img
           src={avatar}
           alt={`Avatart of ${name}`}
@@ -55,7 +56,7 @@ class Tweet extends Component {
             </button>
           <span>{likes !== 0 && likes}</span>
         </div>
-      </div>
+      </Link>
     )
   }
 }
@@ -63,11 +64,10 @@ class Tweet extends Component {
 function mapStateToProps ({authedUser, users, tweets}, {id}) {
   const tweet = tweets[id]
   const parentTweet =tweet ? tweets[tweet.replyingTo] :null
-
   return {
     authedUser,
     tweet: tweet ? formatTweet(tweet, users[tweet.author], authedUser, parentTweet) : null
   }
 }
 
-export default connect(mapStateToProps)(Tweet)
+export default withRouter(connect(mapStateToProps)(Tweet))
