@@ -1,4 +1,4 @@
-import {RECEIVE_TWEETS, TOGGLE_LIKE} from '../actions/tweets';
+import {RECEIVE_TWEETS, TOGGLE_LIKE, ADD_TWEET} from '../actions/tweets';
 
 //state is the users slice of the state
 export default function tweets (state={}, action) {
@@ -18,6 +18,24 @@ export default function tweets (state={}, action) {
           state[action.id].likes.filter((uid) => uid !== action.authedUser)
           : state[action.id].likes.concat([action.authedUser])
         }
+      }
+    case ADD_TWEET:
+      const { tweet } = action;
+      //modified the parent tweet that this tweet replies to
+      let replyingTo = {}
+      if (tweet.replyingTo !== null) {
+        replyingTo={
+          [tweet.replyingTo]:{
+            ...state[tweet.replyingTo],
+            replies: state[tweet.replyingTo].repiles.concat([tweet.id])
+          }
+        }
+      }
+      return {
+        ...state,
+        [tweet.id]: tweet,
+        tweets,
+        ...replyingTo,
       }
     default:
       return state
